@@ -90,7 +90,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 #next{left:19.11%;top:83.747%;width:13.095%;height:11.173%;background:#00CC99;color:#002060;font-size:clamp(22px,2.9vw,58px)}
 #status{position:absolute;left:-9999px}
 
-/* v17: 「この教材について」をゲーム本体へ直接統合 */
+/* v18: 「この教材について」をゲーム本体へ直接統合 */
 #infoButton{
   position:absolute;
   right:1.6%;
@@ -159,7 +159,6 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
   height:8.8%;
 }
 
-/* PCで見やすい大きさ。画像比率を維持 */
 #backQuestionButton{
   left:26.0%;
   top:79.0%;
@@ -168,18 +167,12 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
   aspect-ratio:4/1;
 }
 
-/* スマホ・タブレットではさらに押しやすく */
 @media (hover:none) and (pointer:coarse){
   #backQuestionButton{
     left:21.0%;
     top:77.5%;
     width:58.0%;
   }
-}
-
-button:focus-visible,a:focus-visible{
-  outline:4px solid #fff;
-  outline-offset:3px;
 }
 
 </style>
@@ -201,8 +194,7 @@ button:focus-visible,a:focus-visible{
   <button id="retry" class="ctrl">Try again</button>
   <button id="back" class="ctrl">Back</button>
   <button id="next" class="ctrl">Next</button>
-  
-<div id="status" aria-live="polite"></div>
+  <div id="status" aria-live="polite"></div>
 
 <button id="infoButton" type="button" aria-label="この教材について">
   <img src="info.png" alt="">
@@ -294,7 +286,19 @@ function choose(side,btn){
 }
 left.onclick=()=>choose("left",left);
 right.onclick=()=>choose("right",right);
-document.getElementById("retry").onclick=()=>
+document.getElementById("retry").onclick=()=>render();
+document.getElementById("next").onclick=()=>{
+  if(current===order.length-1){
+    order=shuffleQuestions();
+    sideMemory.clear();
+    current=0;
+  }else{
+    current++;
+  }
+  render();
+};
+document.getElementById("back").onclick=()=>{current=(current-1+order.length)%order.length;render()};
+
 const infoButton=document.getElementById("infoButton");
 const aboutPanel=document.getElementById("aboutPanel");
 const backQuestionButton=document.getElementById("backQuestionButton");
@@ -315,18 +319,6 @@ document.addEventListener("keydown",(e)=>{
   }
 });
 
-render();
-document.getElementById("next").onclick=()=>{
-  if(current===order.length-1){
-    order=shuffleQuestions();
-    sideMemory.clear();
-    current=0;
-  }else{
-    current++;
-  }
-  render();
-};
-document.getElementById("back").onclick=()=>{current=(current-1+order.length)%order.length;render()};
 render();
 </script>
 </body>
