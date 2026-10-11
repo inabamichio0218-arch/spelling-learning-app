@@ -20,8 +20,9 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 
 .choice{
   position:absolute;
-  top:20.1%;
-  height:64.8%;
+  top:20.0%;
+  bottom:14.0%;
+  height:auto;
   border:0;
   padding:0;
   margin:0;
@@ -32,11 +33,11 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
   align-items:center;
   justify-content:center;
   overflow:hidden;
-  border-radius:1.0vw;
-  box-shadow:0 0.35vw 0.8vw rgba(0,0,0,.18);
+  border-radius:0.8vw;
+  box-shadow:0 0.30vw 0.70vw rgba(0,0,0,.18);
 }
-#leftChoice{left:41.1%;width:20.6%}
-#rightChoice{left:71.8%;width:20.6%}
+#leftChoice{left:41.25%;width:20.2%}
+#rightChoice{left:71.95%;width:20.2%}
 .word{font-size:clamp(28px,4.9vw,96px);font-weight:700;line-height:1;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15)}
 .choice.hide-word .word{opacity:0}
 .feedback{
@@ -79,7 +80,13 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 
 <script>
 const QUESTIONS=[{"correct": "apple", "wrong": "applu", "alt": "りんご", "image": "apple.png"}, {"correct": "banana", "wrong": "bananna", "alt": "バナナ", "image": "banana.png"}, {"correct": "orange", "wrong": "orenge", "alt": "オレンジ", "image": "orange.png"}, {"correct": "grape", "wrong": "graip", "alt": "ぶどう", "image": "grape.png"}, {"correct": "bread", "wrong": "bred", "alt": "パン", "image": "bread.png"}, {"correct": "cake", "wrong": "caik", "alt": "ケーキ", "image": "cake.png"}, {"correct": "cat", "wrong": "kat", "alt": "ねこ", "image": "cat.png"}, {"correct": "dog", "wrong": "dogu", "alt": "いぬ", "image": "dog.png"}, {"correct": "bird", "wrong": "berd", "alt": "とり", "image": "bird.png"}, {"correct": "fish", "wrong": "fissh", "alt": "さかな", "image": "fish.png"}, {"correct": "rabbit", "wrong": "rabit", "alt": "うさぎ", "image": "rabbit.png"}, {"correct": "bear", "wrong": "ber", "alt": "くま", "image": "bear.png"}, {"correct": "book", "wrong": "buk", "alt": "本", "image": "book.png"}, {"correct": "pencil", "wrong": "pensil", "alt": "えんぴつ", "image": "pencil.png"}, {"correct": "eraser", "wrong": "erasor", "alt": "消しゴム", "image": "eraser.png"}, {"correct": "notebook", "wrong": "notebok", "alt": "ノート", "image": "notebook.png"}, {"correct": "bag", "wrong": "bagu", "alt": "かばん", "image": "bag.png"}, {"correct": "scissors", "wrong": "scisors", "alt": "はさみ", "image": "scissors.png"}, {"correct": "milk", "wrong": "milc", "alt": "牛乳", "image": "milk.png"}, {"correct": "juice", "wrong": "juce", "alt": "ジュース", "image": "juice.png"}, {"correct": "egg", "wrong": "eg", "alt": "たまご", "image": "egg.png"}, {"correct": "rice", "wrong": "raice", "alt": "ごはん", "image": "rice.png"}, {"correct": "pizza", "wrong": "piza", "alt": "ピザ", "image": "pizza.png"}, {"correct": "hamburger", "wrong": "hanburger", "alt": "ハンバーガー", "image": "hamburger.png"}, {"correct": "car", "wrong": "kar", "alt": "車", "image": "car.png"}, {"correct": "bus", "wrong": "bas", "alt": "バス", "image": "bus.png"}, {"correct": "train", "wrong": "trane", "alt": "電車", "image": "train.png"}, {"correct": "bicycle", "wrong": "bycycle", "alt": "自転車", "image": "bicycle.png"}, {"correct": "airplane", "wrong": "airplain", "alt": "飛行機", "image": "airplane.png"}, {"correct": "boat", "wrong": "bote", "alt": "ボート", "image": "boat.png"}, {"correct": "sun", "wrong": "san", "alt": "太陽", "image": "sun.png"}, {"correct": "moon", "wrong": "mun", "alt": "月", "image": "moon.png"}, {"correct": "star", "wrong": "ster", "alt": "星", "image": "star.png"}, {"correct": "flower", "wrong": "flouer", "alt": "花", "image": "flower.png"}, {"correct": "tree", "wrong": "tre", "alt": "木", "image": "tree.png"}, {"correct": "house", "wrong": "hause", "alt": "家", "image": "house.png"}];
-const order=[...QUESTIONS].sort(()=>Math.random()-.5);
+function shuffleQuestions(){
+  return [...QUESTIONS]
+    .map(q=>({q,sort:Math.random()}))
+    .sort((a,b)=>a.sort-b.sort)
+    .map(x=>x.q);
+}
+let order=shuffleQuestions();
 let current=0, correctSide="left", answered=false;
 const sideMemory=new Map();
 
@@ -141,7 +148,16 @@ function choose(side,btn){
 left.onclick=()=>choose("left",left);
 right.onclick=()=>choose("right",right);
 document.getElementById("retry").onclick=()=>render();
-document.getElementById("next").onclick=()=>{current=(current+1)%order.length;render()};
+document.getElementById("next").onclick=()=>{
+  if(current===order.length-1){
+    order=shuffleQuestions();
+    sideMemory.clear();
+    current=0;
+  }else{
+    current++;
+  }
+  render();
+};
 document.getElementById("back").onclick=()=>{current=(current-1+order.length)%order.length;render()};
 render();
 </script>
