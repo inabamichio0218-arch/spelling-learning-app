@@ -71,6 +71,39 @@ button{font-family:inherit;font-size:inherit}
   margin:0;
 }
 
+
+/* v6: exact screen fit measured from the original PowerPoint phone screens */
+.option{
+  top:18.04% !important;
+  width:22.50% !important;
+  height:69.51% !important;
+  padding:0 !important;
+}
+#leftOption{
+  left:40.10% !important;
+}
+#rightOption{
+  left:70.85% !important;
+}
+
+
+/* v7: keep background and clickable screens in the SAME coordinate system */
+.option{
+  top:17.9% !important;
+  width:22.6% !important;
+  height:69.8% !important;
+  padding:0 !important;
+  background:#062b73 !important;
+}
+#leftOption{ left:40.1% !important; }
+#rightOption{ left:70.75% !important; }
+
+.page{
+  width:100% !important;
+  height:100% !important;
+  transform:none !important;
+}
+
 </style>
 </head>
 <body>
@@ -228,7 +261,7 @@ document.addEventListener('keydown',e=>{
 });
 const viewport=document.querySelector('.viewport'),page=document.querySelector('.page');
 function contentHeight(){const t=page.getBoundingClientRect().top;let b=t+page.scrollHeight;page.querySelectorAll('*').forEach(el=>{if(!el.matches('.sr-only'))b=Math.max(b,el.getBoundingClientRect().bottom)});return b-t}
-function fitPage(){const w=viewport.clientWidth,h=viewport.clientHeight;page.style.transform='none';page.style.width=`${w}px`;if(contentHeight()<=h){page.style.width='100%';return}let lo=.2,hi=1;for(let i=0;i<12;i++){const s=(lo+hi)/2;page.style.width=`${w/s}px`;if(contentHeight()*s<=h)lo=s;else hi=s}page.style.width=`${w/lo}px`;page.style.transform=`scale(${lo})`}
+function fitPage(){page.style.width='100%';page.style.transform='none'}
 let fitFrame;function scheduleFit(){cancelAnimationFrame(fitFrame);fitFrame=requestAnimationFrame(fitPage)}
 new ResizeObserver(scheduleFit).observe(viewport);addEventListener('load',()=>{renderQuestion();scheduleFit()});addEventListener('resize',scheduleFit);document.fonts?.ready.then(scheduleFit);
 </script>
