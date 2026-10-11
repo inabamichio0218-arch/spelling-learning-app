@@ -41,11 +41,44 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 .word{font-size:clamp(28px,4.9vw,96px);font-weight:700;line-height:1;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15)}
 .choice.hide-word .word{opacity:0}
 .feedback{
-  position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);
-  width:42%;aspect-ratio:1/1;display:none;
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%) scale(.65);
+  width:46%;
+  aspect-ratio:1/1;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
 }
-.choice.show-feedback .feedback{display:block}
-.feedback svg{width:100%;height:100%;display:block}
+.choice.show-feedback .feedback{display:flex}
+.feedback img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+.feedback.happy-anim img{
+  animation:happyPop .75s ease-out both;
+}
+.feedback.sad-anim img{
+  animation:sadShake .62s ease-in-out both;
+}
+@keyframes happyPop{
+  0%{transform:scale(.35) rotate(-8deg);opacity:0}
+  55%{transform:scale(1.18) rotate(4deg);opacity:1}
+  78%{transform:scale(.94) rotate(-2deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+@keyframes sadShake{
+  0%{transform:translateX(0) scale(.9);opacity:0}
+  20%{transform:translateX(-10px) scale(1);opacity:1}
+  40%{transform:translateX(10px)}
+  60%{transform:translateX(-7px)}
+  80%{transform:translateX(7px)}
+  100%{transform:translateX(0)}
+}
 
 .ctrl{
   position:absolute;border:2px solid white;border-radius:0.8vw;
@@ -95,18 +128,8 @@ const right=document.getElementById("rightChoice");
 const illustration=document.getElementById("illustration");
 const status=document.getElementById("status");
 
-const smile=`<svg viewBox="0 0 200 200" aria-hidden="true">
-<circle cx="100" cy="100" r="92" fill="#FFC000" stroke="#fff" stroke-width="8"/>
-<path d="M55 75 L80 65 M120 65 L145 75" stroke="#002060" stroke-width="10" stroke-linecap="round"/>
-<path d="M60 118 Q100 158 140 118" fill="none" stroke="#002060" stroke-width="10" stroke-linecap="round"/>
-</svg>`;
-
-const cry=`<svg viewBox="0 0 200 200" aria-hidden="true">
-<circle cx="100" cy="100" r="92" fill="#FFC000" stroke="#fff" stroke-width="8"/>
-<path d="M55 75 L80 85 M120 85 L145 75" stroke="#002060" stroke-width="10" stroke-linecap="round"/>
-<path d="M62 142 Q100 105 138 142" fill="none" stroke="#002060" stroke-width="10" stroke-linecap="round"/>
-<path d="M56 95 C42 112 42 125 56 138 C70 125 70 112 56 95Z" fill="#00CC99" stroke="#fff" stroke-width="5"/>
-</svg>`;
+const smile=`<img src="happy.png" alt="正解">`;
+const cry=`<img src="sad.png" alt="不正解">`;
 
 function sizeWord(el, word){
   const n=[...word].length;
@@ -115,6 +138,8 @@ function sizeWord(el, word){
 }
 function clearChoice(btn){
   btn.classList.remove("hide-word","show-feedback");
+  const fb=btn.querySelector(".feedback");
+  fb.classList.remove("happy-anim","sad-anim");
   btn.querySelector(".feedback").innerHTML="";
   btn.disabled=false;
 }
@@ -141,7 +166,11 @@ function choose(side,btn){
   answered=true;
   const ok=side===correctSide;
   btn.classList.add("hide-word","show-feedback");
-  btn.querySelector(".feedback").innerHTML=ok?smile:cry;
+  const fb=btn.querySelector(".feedback");
+  fb.innerHTML=ok?smile:cry;
+  fb.classList.remove("happy-anim","sad-anim");
+  void fb.offsetWidth;
+  fb.classList.add(ok?"happy-anim":"sad-anim");
   left.disabled=true; right.disabled=true;
   status.textContent=ok?"正解":"不正解";
 }
