@@ -2,15 +2,17 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>PowerPoint Webアプリ スマホで英単語練習</title>
 <style>
 *{box-sizing:border-box}
 html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;font-family:"Yu Gothic UI","Yu Gothic",sans-serif}
 #stage{
-  position:absolute; left:50%; top:50%;
-  width:min(100vw, calc(100vh * 16 / 9));
-  height:min(100vh, calc(100vw * 9 / 16));
+  position:fixed;
+  left:50%;
+  top:50%;
+  width:min(var(--vvw, 100vw), calc(var(--vvh, 100dvh) * 16 / 9));
+  height:min(var(--vvh, 100dvh), calc(var(--vvw, 100vw) * 9 / 16));
   transform:translate(-50%,-50%);
   overflow:hidden;
 }
@@ -320,6 +322,25 @@ document.addEventListener("keydown",(e)=>{
 });
 
 render();
+
+function syncVisualViewport(){
+  const vv = window.visualViewport;
+  const w = vv ? vv.width : window.innerWidth;
+  const h = vv ? vv.height : window.innerHeight;
+  document.documentElement.style.setProperty("--vvw", `${w}px`);
+  document.documentElement.style.setProperty("--vvh", `${h}px`);
+}
+syncVisualViewport();
+window.addEventListener("resize", syncVisualViewport);
+window.addEventListener("orientationchange", ()=>{
+  setTimeout(syncVisualViewport, 100);
+  setTimeout(syncVisualViewport, 400);
+});
+if(window.visualViewport){
+  window.visualViewport.addEventListener("resize", syncVisualViewport);
+  window.visualViewport.addEventListener("scroll", syncVisualViewport);
+}
+
 </script>
 </body>
 </html>
