@@ -19,14 +19,24 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 #illustration img{max-width:78%;max-height:78%;object-fit:contain;filter:drop-shadow(0 0.7vw 0.7vw rgba(0,0,0,.25))}
 
 .choice{
-  position:absolute; top:16.7111%; height:77.9556%;
-  border:0; padding:0; margin:0; background:transparent;
-  color:white; cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
+  position:absolute;
+  top:20.1%;
+  height:64.8%;
+  border:0;
+  padding:0;
+  margin:0;
+  background:#062b73;
+  color:white;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   overflow:hidden;
+  border-radius:1.0vw;
+  box-shadow:0 0.35vw 0.8vw rgba(0,0,0,.18);
 }
-#leftChoice{left:39.40%;width:23.85%}
-#rightChoice{left:70.05%;width:24.05%}
+#leftChoice{left:41.1%;width:20.6%}
+#rightChoice{left:71.8%;width:20.6%}
 .word{font-size:clamp(28px,4.9vw,96px);font-weight:700;line-height:1;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15)}
 .choice.hide-word .word{opacity:0}
 .feedback{
@@ -49,7 +59,7 @@ html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;fon
 </head>
 <body>
 <div id="stage">
-  <img id="bg" src="background_blue_phone.png" alt="">
+  <img id="bg" src="background_white_phone.png" alt="">
   <div id="illustration"></div>
 
   <button id="leftChoice" class="choice" aria-label="左の答え">
