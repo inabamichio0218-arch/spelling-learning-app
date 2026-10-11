@@ -3,212 +3,331 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>英単語スペル練習 TEST</title>
+<title>PowerPoint Webアプリ スマホで英単語練習</title>
 <style>
-  *{box-sizing:border-box}
-  html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#222;
-    font-family:"Yu Gothic UI","Yu Gothic",sans-serif;
-  }
+*{box-sizing:border-box}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#4b4c4e;font-family:"Yu Gothic UI","Yu Gothic",sans-serif}
+#stage{
+  position:absolute; left:50%; top:50%;
+  width:min(100vw, calc(100vh * 16 / 9));
+  height:min(100vh, calc(100vw * 9 / 16));
+  transform:translate(-50%,-50%);
+  overflow:hidden;
+}
+#bg{position:absolute;inset:0;width:100%;height:100%;object-fit:fill;pointer-events:none}
+#illustration{position:absolute;left:5.25%;top:19.5%;width:27%;height:43.5%;display:flex;align-items:center;justify-content:center}
+#illustration img{max-width:78%;max-height:78%;object-fit:contain;filter:drop-shadow(0 0.7vw 0.7vw rgba(0,0,0,.25))}
 
-  .stage{
-    position:absolute;
-    left:50%;
-    top:50%;
-    width:min(100vw,calc(100vh * 16 / 9));
-    height:min(100vh,calc(100vw * 9 / 16));
-    transform:translate(-50%,-50%);
-    overflow:hidden;
-    background:#000;
-  }
+.choice{
+  position:absolute;
+  top:20.0%;
+  bottom:14.0%;
+  height:auto;
+  border:0;
+  padding:0;
+  margin:0;
+  background:#062b73;
+  color:white;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  border-radius:0.8vw;
+  box-shadow:0 0.30vw 0.70vw rgba(0,0,0,.18);
+}
+#leftChoice{left:41.25%;width:20.2%}
+#rightChoice{left:71.95%;width:20.2%}
+.word{font-size:clamp(28px,4.9vw,96px);font-weight:700;line-height:1;white-space:nowrap;text-shadow:0 1px 1px rgba(0,0,0,.15)}
+.choice.hide-word .word{opacity:0}
+.feedback{
+  position:absolute;
+  left:50%;
+  top:50%;
+  transform:translate(-50%,-50%);
+  width:68%;
+  aspect-ratio:1/1;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+}
+.choice.show-feedback .feedback{display:flex}
+.feedback img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
+.feedback.happy-anim img{
+  animation:happyPop .75s ease-out both;
+}
+.feedback.sad-anim img{
+  animation:sadShake .62s ease-in-out both;
+}
+@keyframes happyPop{
+  0%{transform:scale(.35) rotate(-8deg);opacity:0}
+  55%{transform:scale(1.18) rotate(4deg);opacity:1}
+  78%{transform:scale(.94) rotate(-2deg)}
+  100%{transform:scale(1) rotate(0)}
+}
+@keyframes sadShake{
+  0%{transform:translateX(0) scale(.9);opacity:0}
+  20%{transform:translateX(-10px) scale(1);opacity:1}
+  40%{transform:translateX(10px)}
+  60%{transform:translateX(-7px)}
+  80%{transform:translateX(7px)}
+  100%{transform:translateX(0)}
+}
 
-  #appFrame{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    border:0;
-    display:block;
-    background:#000;
-  }
+.ctrl{
+  position:absolute;border:2px solid white;border-radius:0.8vw;
+  color:white;font-weight:700;cursor:pointer;
+  box-shadow:0 2px 4px rgba(0,0,0,.2);
+}
+#retry{left:4.373%;top:69.413%;width:27.833%;height:11.173%;background:#1E4E79;font-size:clamp(24px,3.2vw,64px)}
+#back{left:4.373%;top:83.747%;width:13.095%;height:11.173%;background:#FF3399;font-size:clamp(22px,2.9vw,58px)}
+#next{left:19.11%;top:83.747%;width:13.095%;height:11.173%;background:#00CC99;color:#002060;font-size:clamp(22px,2.9vw,58px)}
+#status{position:absolute;left:-9999px}
 
-  #infoButton{
-    position:absolute;
-    right:1.6%;
-    top:2.2%;
-    width:5.3%;
-    aspect-ratio:1/1;
-    padding:0;
-    border:0;
-    background:transparent;
-    cursor:pointer;
-    z-index:20;
-    transition:transform .15s ease;
-  }
-  #infoButton:hover{transform:scale(1.06)}
-  #infoButton:active{transform:scale(.96)}
-  #infoButton img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-  }
+/* v17: 「この教材について」をゲーム本体へ直接統合 */
+#infoButton{
+  position:absolute;
+  right:1.6%;
+  top:2.2%;
+  width:5.3%;
+  aspect-ratio:1/1;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  z-index:50;
+  transition:transform .15s ease;
+}
+#infoButton:hover{transform:scale(1.06)}
+#infoButton:active{transform:scale(.96)}
+#infoButton img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
 
-  #aboutPanel{
-    position:absolute;
-    inset:0;
-    display:none;
-    z-index:30;
-    background:#395d55;
-  }
-  #aboutPanel.open{display:block}
+#aboutPanel{
+  position:absolute;
+  inset:0;
+  display:none;
+  z-index:100;
+  background:#395d55;
+}
+#aboutPanel.open{display:block}
 
-  #aboutImage{
-    position:absolute;
-    inset:0;
-    width:100%;
-    height:100%;
-    object-fit:fill;
-    display:block;
-  }
+#aboutImage{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:fill;
+  display:block;
+}
 
-  .aboutBtn{
-    position:absolute;
-    padding:0;
-    border:0;
-    background:transparent;
-    cursor:pointer;
-    z-index:31;
-    transition:transform .15s ease, filter .15s ease;
-  }
-  .aboutBtn:hover{
-    transform:scale(1.035);
-    filter:brightness(1.03);
-  }
-  .aboutBtn:active{transform:scale(.97)}
-  .aboutBtn img{
-    width:100%;
-    height:100%;
-    object-fit:contain;
-    display:block;
-  }
+.aboutBtn{
+  position:absolute;
+  padding:0;
+  border:0;
+  background:transparent;
+  cursor:pointer;
+  z-index:101;
+  transition:transform .15s ease,filter .15s ease;
+}
+.aboutBtn:hover{
+  transform:scale(1.035);
+  filter:brightness(1.03);
+}
+.aboutBtn:active{transform:scale(.97)}
+.aboutBtn img{
+  width:100%;
+  height:100%;
+  object-fit:contain;
+  display:block;
+}
 
-  /* about.png のレイアウトに合わせた配置 */
-  #youtubeButton{
-    left:12.7%;
-    top:69.6%;
-    width:24.0%;
-    height:8.8%;
-  }
+#youtubeButton{
+  left:12.7%;
+  top:69.6%;
+  width:24.0%;
+  height:8.8%;
+}
 
+/* PCで見やすい大きさ。画像比率を維持 */
+#backQuestionButton{
+  left:26.0%;
+  top:79.0%;
+  width:48.0%;
+  height:auto;
+  aspect-ratio:4/1;
+}
+
+/* スマホ・タブレットではさらに押しやすく */
+@media (hover:none) and (pointer:coarse){
   #backQuestionButton{
-    left:26.0%;
-    top:79.0%;
-    width:48.0%;
-    height:auto;
-    aspect-ratio:4 / 1;
+    left:21.0%;
+    top:77.5%;
+    width:58.0%;
   }
+}
 
-  /* スマホ・タブレットなどタッチ端末では、はっきり大きく */
-  @media (hover: none) and (pointer: coarse){
-    #backQuestionButton{
-      left:21.0%;
-      top:77.5%;
-      width:58.0%;
-      height:auto;
-      aspect-ratio:4 / 1;
-    }
-  }
+button:focus-visible,a:focus-visible{
+  outline:4px solid #fff;
+  outline-offset:3px;
+}
 
-  /* 幅が狭い画面でも大きめに */
-  @media (max-width: 900px){
-    #backQuestionButton{
-      left:21.0%;
-      top:77.5%;
-      width:58.0%;
-      height:auto;
-      aspect-ratio:4 / 1;
-    }
-  }
-
-  /* キーボード利用者向け */
-  button:focus-visible, a:focus-visible{
-    outline:4px solid #fff;
-    outline-offset:3px;
-    border-radius:12px;
-  }
 </style>
 </head>
 <body>
+<div id="stage">
+  <img id="bg" src="background_white_phone.png" alt="">
+  <div id="illustration"></div>
 
-<div class="stage">
-  <!-- 本番の英単語アプリをそのまま表示 -->
-  <iframe
-    id="appFrame"
-    src="https://inabamichio0218-arch.github.io/spelling-learning-app/"
-    title="英単語スペル練習"
-    allowfullscreen>
-  </iframe>
-
-  <!-- 教材情報 -->
-  <button id="infoButton" type="button" aria-label="この教材について">
-    <img src="info.png" alt="">
+  <button id="leftChoice" class="choice" aria-label="左の答え">
+    <span class="word"></span>
+    <span class="feedback"></span>
+  </button>
+  <button id="rightChoice" class="choice" aria-label="右の答え">
+    <span class="word"></span>
+    <span class="feedback"></span>
   </button>
 
-  <!-- この教材について -->
-  <section id="aboutPanel" aria-hidden="true">
-    <img id="aboutImage" src="about.png" alt="この教材について">
+  <button id="retry" class="ctrl">Try again</button>
+  <button id="back" class="ctrl">Back</button>
+  <button id="next" class="ctrl">Next</button>
+  
+<div id="status" aria-live="polite"></div>
 
-    <a
-      id="youtubeButton"
-      class="aboutBtn"
-      href="https://www.youtube.com/@PowerPoint-MVP"
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label="YouTubeで見る">
-      <img src="btn-youtube.png" alt="YouTubeで見る">
-    </a>
+<button id="infoButton" type="button" aria-label="この教材について">
+  <img src="info.png" alt="">
+</button>
 
-    <button
-      id="backQuestionButton"
-      class="aboutBtn"
-      type="button"
-      aria-label="問題にもどる">
-      <img src="btn-back-question.png" alt="問題にもどる">
-    </button>
-  </section>
+<section id="aboutPanel" aria-hidden="true">
+  <img id="aboutImage" src="about.png" alt="この教材について">
+
+  <a id="youtubeButton"
+     class="aboutBtn"
+     href="https://www.youtube.com/@PowerPoint-MVP"
+     target="_blank"
+     rel="noopener noreferrer"
+     aria-label="YouTubeで見る">
+    <img src="btn-youtube.png" alt="YouTubeで見る">
+  </a>
+
+  <button id="backQuestionButton"
+          class="aboutBtn"
+          type="button"
+          aria-label="問題にもどる">
+    <img src="btn-back-question.png" alt="問題にもどる">
+  </button>
+</section>
 </div>
 
 <script>
-  const infoButton = document.getElementById("infoButton");
-  const aboutPanel = document.getElementById("aboutPanel");
-  const backQuestionButton = document.getElementById("backQuestionButton");
+const QUESTIONS=[{"correct": "apple", "wrong": "applu", "alt": "りんご", "image": "apple.png"}, {"correct": "banana", "wrong": "bananna", "alt": "バナナ", "image": "banana.png"}, {"correct": "orange", "wrong": "orenge", "alt": "オレンジ", "image": "orange.png"}, {"correct": "grape", "wrong": "graip", "alt": "ぶどう", "image": "grape.png"}, {"correct": "bread", "wrong": "bred", "alt": "パン", "image": "bread.png"}, {"correct": "cake", "wrong": "caik", "alt": "ケーキ", "image": "cake.png"}, {"correct": "cat", "wrong": "kat", "alt": "ねこ", "image": "cat.png"}, {"correct": "dog", "wrong": "dogu", "alt": "いぬ", "image": "dog.png"}, {"correct": "bird", "wrong": "berd", "alt": "とり", "image": "bird.png"}, {"correct": "fish", "wrong": "fissh", "alt": "さかな", "image": "fish.png"}, {"correct": "rabbit", "wrong": "rabit", "alt": "うさぎ", "image": "rabbit.png"}, {"correct": "bear", "wrong": "ber", "alt": "くま", "image": "bear.png"}, {"correct": "book", "wrong": "buk", "alt": "本", "image": "book.png"}, {"correct": "pencil", "wrong": "pensil", "alt": "えんぴつ", "image": "pencil.png"}, {"correct": "eraser", "wrong": "erasor", "alt": "消しゴム", "image": "eraser.png"}, {"correct": "notebook", "wrong": "notebok", "alt": "ノート", "image": "notebook.png"}, {"correct": "bag", "wrong": "bagu", "alt": "かばん", "image": "bag.png"}, {"correct": "scissors", "wrong": "scisors", "alt": "はさみ", "image": "scissors.png"}, {"correct": "milk", "wrong": "milc", "alt": "牛乳", "image": "milk.png"}, {"correct": "juice", "wrong": "juce", "alt": "ジュース", "image": "juice.png"}, {"correct": "egg", "wrong": "eg", "alt": "たまご", "image": "egg.png"}, {"correct": "rice", "wrong": "raice", "alt": "ごはん", "image": "rice.png"}, {"correct": "pizza", "wrong": "piza", "alt": "ピザ", "image": "pizza.png"}, {"correct": "hamburger", "wrong": "hanburger", "alt": "ハンバーガー", "image": "hamburger.png"}, {"correct": "car", "wrong": "kar", "alt": "車", "image": "car.png"}, {"correct": "bus", "wrong": "bas", "alt": "バス", "image": "bus.png"}, {"correct": "train", "wrong": "trane", "alt": "電車", "image": "train.png"}, {"correct": "bicycle", "wrong": "bycycle", "alt": "自転車", "image": "bicycle.png"}, {"correct": "airplane", "wrong": "airplain", "alt": "飛行機", "image": "airplane.png"}, {"correct": "boat", "wrong": "bote", "alt": "ボート", "image": "boat.png"}, {"correct": "sun", "wrong": "san", "alt": "太陽", "image": "sun.png"}, {"correct": "moon", "wrong": "mun", "alt": "月", "image": "moon.png"}, {"correct": "star", "wrong": "ster", "alt": "星", "image": "star.png"}, {"correct": "flower", "wrong": "flouer", "alt": "花", "image": "flower.png"}, {"correct": "tree", "wrong": "tre", "alt": "木", "image": "tree.png"}, {"correct": "house", "wrong": "hause", "alt": "家", "image": "house.png"}];
+function shuffleQuestions(){
+  return [...QUESTIONS]
+    .map(q=>({q,sort:Math.random()}))
+    .sort((a,b)=>a.sort-b.sort)
+    .map(x=>x.q);
+}
+let order=shuffleQuestions();
+let current=0, correctSide="left", answered=false;
+const sideMemory=new Map();
 
-  function openAbout(){
-    aboutPanel.classList.add("open");
-    aboutPanel.setAttribute("aria-hidden","false");
-    backQuestionButton.focus();
+const left=document.getElementById("leftChoice");
+const right=document.getElementById("rightChoice");
+const illustration=document.getElementById("illustration");
+const status=document.getElementById("status");
+
+const smile=`<img src="happy.png" alt="正解">`;
+const cry=`<img src="sad.png" alt="不正解">`;
+
+function sizeWord(el, word){
+  const n=[...word].length;
+  const size = n<=5?4.9:n<=7?4.3:n<=9?3.7:n<=11?3.2:2.8;
+  el.style.fontSize=`${size}vw`;
+}
+function clearChoice(btn){
+  btn.classList.remove("hide-word","show-feedback");
+  const fb=btn.querySelector(".feedback");
+  fb.classList.remove("happy-anim","sad-anim");
+  btn.querySelector(".feedback").innerHTML="";
+  btn.disabled=false;
+}
+function render(){
+  answered=false;
+  const q=order[current];
+  if(!sideMemory.has(current)) sideMemory.set(current,Math.random()<.5?"left":"right");
+  correctSide=sideMemory.get(current);
+
+  illustration.innerHTML=`<img src="${q.image}" alt="${q.alt}">`;
+
+  clearChoice(left); clearChoice(right);
+
+  const lw=correctSide==="left"?q.correct:q.wrong;
+  const rw=correctSide==="right"?q.correct:q.wrong;
+  left.querySelector(".word").textContent=lw;
+  right.querySelector(".word").textContent=rw;
+  sizeWord(left.querySelector(".word"),lw);
+  sizeWord(right.querySelector(".word"),rw);
+  status.textContent=`${current+1}問目`;
+}
+function choose(side,btn){
+  if(answered)return;
+  answered=true;
+  const ok=side===correctSide;
+  btn.classList.add("hide-word","show-feedback");
+  const fb=btn.querySelector(".feedback");
+  fb.innerHTML=ok?smile:cry;
+  fb.classList.remove("happy-anim","sad-anim");
+  void fb.offsetWidth;
+  fb.classList.add(ok?"happy-anim":"sad-anim");
+  left.disabled=true; right.disabled=true;
+  status.textContent=ok?"正解":"不正解";
+}
+left.onclick=()=>choose("left",left);
+right.onclick=()=>choose("right",right);
+document.getElementById("retry").onclick=()=>
+const infoButton=document.getElementById("infoButton");
+const aboutPanel=document.getElementById("aboutPanel");
+const backQuestionButton=document.getElementById("backQuestionButton");
+
+function openAbout(){
+  aboutPanel.classList.add("open");
+  aboutPanel.setAttribute("aria-hidden","false");
+}
+function closeAbout(){
+  aboutPanel.classList.remove("open");
+  aboutPanel.setAttribute("aria-hidden","true");
+}
+infoButton.addEventListener("click",openAbout);
+backQuestionButton.addEventListener("click",closeAbout);
+document.addEventListener("keydown",(e)=>{
+  if(e.key==="Escape" && aboutPanel.classList.contains("open")){
+    closeAbout();
   }
+});
 
-  function closeAbout(){
-    aboutPanel.classList.remove("open");
-    aboutPanel.setAttribute("aria-hidden","true");
-    infoButton.focus();
+render();
+document.getElementById("next").onclick=()=>{
+  if(current===order.length-1){
+    order=shuffleQuestions();
+    sideMemory.clear();
+    current=0;
+  }else{
+    current++;
   }
-
-  infoButton.addEventListener("click", openAbout);
-  backQuestionButton.addEventListener("click", closeAbout);
-
-  document.addEventListener("keydown", (e)=>{
-    if(e.key === "Escape" && aboutPanel.classList.contains("open")){
-      closeAbout();
-    }
-  });
+  render();
+};
+document.getElementById("back").onclick=()=>{current=(current-1+order.length)%order.length;render()};
+render();
 </script>
-
 </body>
 </html>
